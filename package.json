@@ -1,0 +1,13 @@
+{
+  "name": "meu-projeto-nodejs",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app_old.js",
+  "scripts": {
+    "start": "node app_old.js"
+  },
+  "dependencies": {
+    "express": "^4.18.1",
+    "express-handlebars": "^7.1.3"
+  }
+}
