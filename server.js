@@ -1,41 +1,30 @@
 const express = require('express');
-const http = require('http');
-const WebSocket = require('ws');
+const mongoose = require('mongoose');
+const bodyParser = require('body-parser');
 
 const app = express();
-const server = http.createServer(app);
-const wss = new WebSocket.Server({ server });
 
-let messages = [];
+// Middlewares da aplicação
+app.use(bodyParser.json());
 
-wss.on('connection', (ws) => {
-    console.log('Novo cliente conectado!');
+// Onde importo as rotas
+const toyRoutes = require('./routes/toy.routes');  // Sempre preciso confdirmar se o caminho está correto
 
-    
-    ws.send(JSON.stringify(messages));
+// Usando as rotas
+app.use('/api', toyRoutes);
 
-    ws.on('message', (message) => {
-        console.log('Received:', message);
-        const msgObject = { socktid: ws._socket.remoteAddress, mensagem: message };
-
- 
-        messages.push(msgObject);
-
-       
-        wss.clients.forEach(client => {
-            if (client.readyState === WebSocket.OPEN) {
-                client.send(JSON.stringify([msgObject]));
-            }
-        });
-    });
-
-    ws.on('close', () => {
-        console.log('Cliente desconectado');
-    });
+// Onde conecto ao MongoDB
+mongoose.connect('mongodb://localhost/toyshop', {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+}).then(() => {
+    console.log('Conectado ao MongoDB');
+}).catch((err) => {
+    console.error('Erro ao conectar ao MongoDB', err);
 });
 
-app.use(express.static('public'));
-
-server.listen(3000, () => {
-    console.log('Server is listening on port 3000');
+// Inicializa o servidor
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+    console.log(`Servidor rodando na porta ${PORT}`);
 });
